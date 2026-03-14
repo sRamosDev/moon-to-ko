@@ -5,7 +5,7 @@ import sys
 
 class EpubExporter:
     @staticmethod
-    def export(extractor, output_dir: str) -> int:
+    def export(extractor, output_dir: str, progress_cb=None) -> int:
         books_dir = os.path.join(output_dir, "books")
         os.makedirs(books_dir, exist_ok=True)
         epub_paths = [
@@ -16,7 +16,12 @@ class EpubExporter:
         from tqdm import tqdm
         
         extracted_count = 0
-        for epub_path in tqdm(epub_paths, desc="Extracting EPUBs", unit="file"):
+        total_epubs = len(epub_paths)
+        
+        # If GUI progress callback provided, skip tqdm to avoid terminal spam
+        iterator = epub_paths if progress_cb else tqdm(epub_paths, desc="Extracting EPUBs", unit="file")
+        
+        for epub_path in iterator:
             content = extractor.get_file_content(epub_path)
             if content:
                 basename = os.path.basename(epub_path)
@@ -24,5 +29,7 @@ class EpubExporter:
                 with open(out_book, "wb") as f:
                     f.write(content)
                 extracted_count += 1
+                if progress_cb:
+                    progress_cb(extracted_count, total_epubs)
                 
         return extracted_count

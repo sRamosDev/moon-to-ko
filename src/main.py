@@ -9,6 +9,68 @@ from src.db_mapper import DbMapper
 from src.koreader_exporter import KOReaderExporter
 
 
+def run_migration(input_file: str, output_dir: str, extract_epubs: bool, extract_replacements: bool, status_cb=None, progress_cb=None):
+    def update_status(msg):
+        if status_cb:
+            status_cb(msg)
+        else:
+            print(msg)
+
+    if not os.path.exists(input_file):
+        raise FileNotFoundError(f"Input file '{input_file}' does not exist.")
+
+    update_status(f"Starting migration from {input_file} to {output_dir}")
+    os.makedirs(output_dir, exist_ok=True)
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        db_path = os.path.join(temp_dir, "mrbooks.db")
+
+        # 1. Extract DB
+        update_status("Extracting Moon+ Reader database...")
+        extractor = MrproExtractor(input_file)
+        extractor.extract_db_to(db_path)
+        update_status("Database extracted successfully.")
+
+        # 2. Map DB
+        update_status("Parsing reading statistics and metadata...")
+        mapper = DbMapper(db_path)
+        books = mapper.get_books()
+        stats = mapper.get_statistics()
+        progresses = mapper.get_read_progresses()
+
+        update_status(f"Found {len(books)} books, {len(stats)} stat records, and {len(progresses)} reading progresses.")
+
+        # Optional Extractions
+        if extract_epubs:
+            update_status("Extracting EPUB files...")
+            from src.epub_exporter import EpubExporter
+
+            count = EpubExporter.export(extractor, output_dir, progress_cb=progress_cb)
+            update_status(f"Extracted {count} EPUB files.")
+
+        book_rules_map = {}
+        if extract_replacements:
+            update_status("Parsing text replacement rules...")
+            from src.replacements_exporter import ReplacementsExporter
+
+            global_count = ReplacementsExporter.export_global_rules(extractor, output_dir)
+            if global_count > 0:
+                update_status(f"Exported global replacements ({global_count} rules).")
+
+            book_rules_map = ReplacementsExporter.extract_book_rules(extractor)
+            update_status(f"Exported book-specific replacements for {len(book_rules_map)} books.")
+
+        # 3. Export to KOReader
+        update_status("Generating KOReader statistics.sqlite and .sdr sidecars...")
+        exporter = KOReaderExporter(output_dir)
+        exporter.export_statistics(books, stats)
+        exporter.export_sdr_folders(progresses, book_rules_map=book_rules_map)
+
+    update_status("Migration complete!")
+    update_status("Copy the generated `statistics.sqlite3` to your KOReader settings folder.")
+    update_status("Copy the generated `.sdr` folders next to your actual book files on your e-reader.")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Moon+ Reader Pro to KOReader migration tool"
@@ -34,76 +96,11 @@ def main():
     )
     args = parser.parse_args()
 
-    input_file = args.input
-    output_dir = args.output
-
-    if not os.path.exists(input_file):
-        print(f"Error: Input file '{input_file}' does not exist.")
+    try:
+        run_migration(args.input, args.output, args.extract_epubs, args.extract_replacements)
+    except Exception as e:
+        print(f"Error during migration: {e}")
         sys.exit(1)
-
-    print(f"Starting migration from {input_file} to {output_dir}")
-    os.makedirs(output_dir, exist_ok=True)
-
-    with tempfile.TemporaryDirectory() as temp_dir:
-        db_path = os.path.join(temp_dir, "mrbooks.db")
-
-        # 1. Extract DB
-        print("Extracting Moon+ Reader database...")
-        try:
-            extractor = MrproExtractor(input_file)
-            extractor.extract_db_to(db_path)
-            print("Database extracted successfully.")
-        except Exception as e:
-            print(f"Error during extraction: {e}")
-            sys.exit(1)
-
-        # 2. Map DB
-        print("Parsing reading statistics and metadata...")
-        mapper = DbMapper(db_path)
-        books = mapper.get_books()
-        stats = mapper.get_statistics()
-        progresses = mapper.get_read_progresses()
-
-        print(
-            f"Found {len(books)} books, {len(stats)} stat records, and {len(progresses)} reading progresses."
-        )
-
-        # Optional Extractions
-        if args.extract_epubs:
-            print("Extracting EPUB files...")
-            from src.epub_exporter import EpubExporter
-
-            count = EpubExporter.export(extractor, output_dir)
-            print(f"Extracted {count} EPUB files.")
-
-        book_rules_map = {}
-        if args.extract_replacements:
-            print("Parsing text replacement rules...")
-            from src.replacements_exporter import ReplacementsExporter
-
-            global_count = ReplacementsExporter.export_global_rules(
-                extractor, output_dir
-            )
-            if global_count > 0:
-                print(f"Exported global replacements ({global_count} rules).")
-
-            book_rules_map = ReplacementsExporter.extract_book_rules(extractor)
-            print(
-                f"Exported book-specific replacements for {len(book_rules_map)} books."
-            )
-
-        # 3. Export to KOReader
-        print("Generating KOReader statistics.sqlite and .sdr sidecars...")
-        exporter = KOReaderExporter(output_dir)
-        exporter.export_statistics(books, stats)
-        exporter.export_sdr_folders(progresses, book_rules_map=book_rules_map)
-
-    print(f"Migration complete! Files saved to {output_dir}")
-    print("Copy the generated `statistics.sqlite3` to your KOReader settings folder.")
-    print(
-        "Copy the generated `.sdr` folders next to your actual book files on your e-reader."
-    )
-
 
 if __name__ == "__main__":
     main()

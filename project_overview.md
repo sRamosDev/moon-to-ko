@@ -4,6 +4,12 @@
 Evaluate and potentially implement a tool that allows people to use a Moon+ Reader Pro backup file (`.mrpro`) to transfer their books and reading progress to KOReader.
 
 ## Active Phase
+- **Phase 4: Graphical User Interface & Packaging**
+  - Build a sleek `customtkinter` GUI.
+  - Wrap the existing orchestrator logic into the GUI.
+  - Use `pyinstaller` to bundle the application into a standalone Windows `.exe`.
+
+## Previous Phases
 - **Phase 3: Optional Extractions [COMPLETED]**
   - Implement `--extract-epubs` CLI argument.
   - Implement `--extract-replacements` CLI argument for global and book-specific replacements.

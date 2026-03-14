@@ -10,3 +10,8 @@ wheels/
 .venv
 2026-01-19/
 out_koreader_final/
+
+# PyInstaller
+dist/
+build/
+*.spec
