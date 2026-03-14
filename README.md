@@ -3,11 +3,12 @@
 > [!WARNING]
 > DISCLAIMER: Vibe-coded at 1 AM for personal use. Proceed with extreme caution.
 
+> This is supposed to be used on new KoReader libraries only... 
+
 > I stopped reading the code around 1:30 AM and published this at 2 AM before passing out. I don't even know if it works yet.
 
-> It doens't work on my machine™, but you use it entirely at your own risk. I am not responsible if running this script turns your e-reader into a paperweight  or completely scrambles your reading history.
+> It doens't work on my machine™, and if you use it, do it entirely at your own risk. I am not responsible if running this script turns your e-reader into a paperweight  or completely scrambles your reading history.
 
-> Oh, and btw, this is supposed to be used on new KoReader libraries only... 
 
 A CLI tool for migrating reading progress, statistics, EPUB files, and text replacement rules from Moon+ Reader Pro (`.mrpro` backups) to KOReader.
 
