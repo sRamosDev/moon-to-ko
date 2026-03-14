@@ -19,10 +19,6 @@ A CLI tool for migrating reading progress, statistics, EPUB files, and text repl
 - **Text Replacements**: Parses custom Lua/Regex book-specific replacements and seamlessly generates KOReader `.sdr` rule sidecars.
 - **Desktop GUI**: A clean, dark-mode graphical interface. No terminal required.
 
-## Quick Start (Standalone Executable)
-
-Download the latest `MoonToKo.exe` from the [Releases](../../releases) page. Double-click it. No Python installation required.
-
 ## Usage (CLI)
 
 ```bash
