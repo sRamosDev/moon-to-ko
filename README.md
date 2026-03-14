@@ -2,11 +2,11 @@
 
 > [!WARNING]
 > DISCLAIMER: Vibe-coded at 1 AM for personal use. Proceed with extreme caution.
-
+>
 > This is supposed to be used on new KoReader libraries only... 
-
+>
 > I stopped reading the code around 1:30 AM and published this at 2 AM before passing out. I don't even know if it works yet.
-
+>
 > It doens't work on my machine™, and if you use it, do it entirely at your own risk. I am not responsible if running this script turns your e-reader into a paperweight  or completely scrambles your reading history.
 
 

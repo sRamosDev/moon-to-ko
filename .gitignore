@@ -8,6 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
+.teams/
 2026-01-19/
 out_koreader_final/
 
