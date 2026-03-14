@@ -1,8 +1,13 @@
 # Moon to Ko
 
 > [!WARNING]
-> **DISCLAIMER: This is a 100% vibe-coded project built expressly for my personal use.** Started at 1 am and didnt read anything written after 2 am.
-> While it works on my machine™, I highly advise against using it. If you decide to do so anyway, against my advice, you do so entirely at your own risk. I take no responsibility if it accidentally turns your e-reader into a toaster or scrambles your reading history.
+> DISCLAIMER: Vibe-coded at 1 AM for personal use. Proceed with extreme caution.
+
+> I stopped reading the code around 1:30 AM and published this at 2 AM before passing out. I don't even know if it works yet.
+
+> It doens't work on my machine™, but you use it entirely at your own risk. I am not responsible if running this script turns your e-reader into a paperweight  or completely scrambles your reading history.
+
+> Oh, and btw, this is supposed to be used on new KoReader libraries only... 
 
 A CLI tool for migrating reading progress, statistics, EPUB files, and text replacement rules from Moon+ Reader Pro (`.mrpro` backups) to KOReader.
 
