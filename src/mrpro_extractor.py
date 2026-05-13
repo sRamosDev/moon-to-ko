@@ -16,7 +16,9 @@ class MrproExtractor:
         with zipfile.ZipFile(self.mrpro_path, "r") as zf:
             # Read _names.list
             names_list_path = "com.flyersoft.moonreaderp/_names.list"
-            if names_list_path not in zf.namelist():
+            try:
+                zf.getinfo(names_list_path)
+            except KeyError:
                 raise FileNotFoundError(
                     f"{names_list_path} not found in the backup archive."
                 )
