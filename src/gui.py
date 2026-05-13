@@ -2,7 +2,6 @@
 import customtkinter as ctk
 import tkinter.filedialog as filedialog
 import threading
-import sys
 import os
 
 from src.main import run_migration
