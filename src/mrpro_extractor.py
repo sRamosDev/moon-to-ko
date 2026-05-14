@@ -17,14 +17,12 @@ class MrproExtractor:
             # Read _names.list
             names_list_path = "com.flyersoft.moonreaderp/_names.list"
             try:
-                zf.getinfo(names_list_path)
+                with zf.open(names_list_path) as f:
+                    content = f.read().decode("utf-8")
             except KeyError:
                 raise FileNotFoundError(
                     f"{names_list_path} not found in the backup archive."
                 )
-
-            with zf.open(names_list_path) as f:
-                content = f.read().decode("utf-8")
 
             for idx, line in enumerate(content.splitlines()):
                 cleaned_line = line.strip()
@@ -54,7 +52,7 @@ class MrproExtractor:
 
         if zf is not None:
             return _read_from_zip(zf)
-            
+
         with zipfile.ZipFile(self.mrpro_path, "r") as mz:
             return _read_from_zip(mz)
 
