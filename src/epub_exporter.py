@@ -1,6 +1,5 @@
 # TEAM_001: Exports EPUB files directly from the .mrpro archive matching original structure.
 import os
-import sys
 
 
 class EpubExporter:
