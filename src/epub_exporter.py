@@ -1,6 +1,4 @@
-# TEAM_001: Exports EPUB files directly from the .mrpro archive matching original structure.
 import os
-
 
 class EpubExporter:
     @staticmethod
@@ -26,12 +24,14 @@ class EpubExporter:
         for epub_path in iterator:
             basename = os.path.basename(epub_path)
             out_book = os.path.join(books_dir, basename)
+
             try:
                 extractor.extract_file_to(epub_path, out_book)
                 extracted_count += 1
                 if progress_cb:
                     progress_cb(extracted_count, total_epubs)
-            except FileNotFoundError:
-                continue
-
+            except Exception:
+                # Handle case where file might not exist or other issues
+                pass
+                
         return extracted_count
