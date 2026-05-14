@@ -42,3 +42,22 @@ def test_extract_db_to(dummy_mrpro, tmp_path):
     extractor.extract_db_to(str(dest))
     assert dest.exists()
     assert dest.read_bytes() == b"fake_db_content"
+
+def test_extractor_get_content_not_found(dummy_mrpro):
+    extractor = MrproExtractor(str(dummy_mrpro))
+    with pytest.raises(FileNotFoundError, match="Original path 'nonexistent.file' not found in the backup mapping."):
+        extractor.get_file_content("nonexistent.file")
+
+def test_extractor_get_content_tag_file_missing(tmp_path):
+    # Create an archive with a valid name map but missing tag file
+    mrpro_path = tmp_path / "missing_tag.mrpro"
+    with zipfile.ZipFile(mrpro_path, "w") as zf:
+        zf.writestr(
+            "com.flyersoft.moonreaderp/_names.list",
+            "com.flyersoft.moonreaderp/databases/mrbooks.db\n",
+        )
+        # We purposely do not write "com.flyersoft.moonreaderp/1.tag"
+
+    extractor = MrproExtractor(str(mrpro_path))
+    with pytest.raises(FileNotFoundError, match="Mapped tag file 'com.flyersoft.moonreaderp/1.tag' not found in the backup archive."):
+        extractor.get_file_content("com.flyersoft.moonreaderp/databases/mrbooks.db")
