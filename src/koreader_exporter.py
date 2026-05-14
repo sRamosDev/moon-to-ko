@@ -48,6 +48,7 @@ class KOReaderExporter:
         conn = sqlite3.connect(self.db_path)
         try:
             cursor = conn.cursor()
+            data_to_insert = []
             for b in books:
                 s = stat_map.get(b.filename)
                 total_time = (
@@ -55,13 +56,16 @@ class KOReaderExporter:
                     if s and s.usedTime > 10000
                     else (s.usedTime if s else 0)
                 )
-                # Just insert what we have
-                cursor.execute(
+                data_to_insert.append((b.title, b.author, total_time))
+
+            # Just insert what we have
+            if data_to_insert:
+                cursor.executemany(
                     """
                     INSERT INTO book (title, authors, total_read_time)
                     VALUES (?, ?, ?)
-                """,
-                    (b.title, b.author, total_time),
+                    """,
+                    data_to_insert,
                 )
             conn.commit()
         finally:
