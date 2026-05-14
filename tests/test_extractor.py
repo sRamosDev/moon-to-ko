@@ -43,9 +43,19 @@ def test_extract_db_to(dummy_mrpro, tmp_path):
     assert dest.exists()
     assert dest.read_bytes() == b"fake_db_content"
 
+
 def test_extract_file_to(dummy_mrpro, tmp_path):
     extractor = MrproExtractor(str(dummy_mrpro))
     dest = tmp_path / "mybook.epub.r"
     extractor.extract_file_to("?/sdcard/Books/mybook.epub.r", str(dest))
     assert dest.exists()
     assert dest.read_bytes() == b"fake_progress_data"
+
+
+def test_extractor_missing_path(dummy_mrpro):
+    extractor = MrproExtractor(str(dummy_mrpro))
+    with pytest.raises(
+        FileNotFoundError,
+        match="Original path 'nonexistent_path' not found in the backup mapping.",
+    ):
+        extractor.get_file_content("nonexistent_path")
