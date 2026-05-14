@@ -20,15 +20,16 @@ class EpubExporter:
         # If GUI progress callback provided, skip tqdm to avoid terminal spam
         iterator = epub_paths if progress_cb else tqdm(epub_paths, desc="Extracting EPUBs", unit="file")
         
-        for epub_path in iterator:
-            content = extractor.get_file_content(epub_path)
-            if content:
-                basename = os.path.basename(epub_path)
-                out_book = os.path.join(books_dir, basename)
-                with open(out_book, "wb") as f:
-                    f.write(content)
-                extracted_count += 1
-                if progress_cb:
-                    progress_cb(extracted_count, total_epubs)
+        with zipfile.ZipFile(extractor.mrpro_path, "r") as zf:
+            for epub_path in iterator:
+                content = extractor.get_file_content(epub_path, zf=zf)
+                if content:
+                    basename = os.path.basename(epub_path)
+                    out_book = os.path.join(books_dir, basename)
+                    with open(out_book, "wb") as f:
+                        f.write(content)
+                    extracted_count += 1
+                    if progress_cb:
+                        progress_cb(extracted_count, total_epubs)
                 
         return extracted_count
