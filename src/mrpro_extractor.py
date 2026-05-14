@@ -54,7 +54,7 @@ class MrproExtractor:
 
         if zf is not None:
             return _read_from_zip(zf)
-            
+
         with zipfile.ZipFile(self.mrpro_path, "r") as mz:
             return _read_from_zip(mz)
 
@@ -63,7 +63,9 @@ class MrproExtractor:
         self._load_names_list()
         return list(self._name_map.keys())
 
-    def extract_file_to(self, original_path: str, destination_path: str, zf: zipfile.ZipFile = None):
+    def extract_file_to(
+        self, original_path: str, destination_path: str, zf: zipfile.ZipFile = None
+    ):
         """Extract a Specific file to a destination path."""
         tag_filename = self._get_tag_filename(original_path)
 
