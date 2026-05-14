@@ -11,24 +11,27 @@ class EpubExporter:
             p for p in extractor.get_all_original_paths() if p.lower().endswith(".epub")
         ]
 
-        import zipfile
         from tqdm import tqdm
-        
+
         extracted_count = 0
         total_epubs = len(epub_paths)
-        
+
         # If GUI progress callback provided, skip tqdm to avoid terminal spam
-        iterator = epub_paths if progress_cb else tqdm(epub_paths, desc="Extracting EPUBs", unit="file")
-        
+        iterator = (
+            epub_paths
+            if progress_cb
+            else tqdm(epub_paths, desc="Extracting EPUBs", unit="file")
+        )
+
         for epub_path in iterator:
-            content = extractor.get_file_content(epub_path)
-            if content:
-                basename = os.path.basename(epub_path)
-                out_book = os.path.join(books_dir, basename)
-                with open(out_book, "wb") as f:
-                    f.write(content)
+            basename = os.path.basename(epub_path)
+            out_book = os.path.join(books_dir, basename)
+            try:
+                extractor.extract_file_to(epub_path, out_book)
                 extracted_count += 1
                 if progress_cb:
                     progress_cb(extracted_count, total_epubs)
-                
+            except FileNotFoundError:
+                continue
+
         return extracted_count
