@@ -9,14 +9,7 @@ from src.db_mapper import DbMapper
 from src.koreader_exporter import KOReaderExporter
 
 
-def run_migration(
-    input_file: str,
-    output_dir: str,
-    extract_epubs: bool,
-    extract_replacements: bool,
-    status_cb=None,
-    progress_cb=None,
-):
+def run_migration(input_file: str, output_dir: str, extract_epubs: bool, extract_replacements: bool, status_cb=None, progress_cb=None):
     def update_status(msg):
         if status_cb:
             status_cb(msg)
@@ -45,9 +38,7 @@ def run_migration(
         stats = mapper.get_statistics()
         progresses = mapper.get_read_progresses()
 
-        update_status(
-            f"Found {len(books)} books, {len(stats)} stat records, and {len(progresses)} reading progresses."
-        )
+        update_status(f"Found {len(books)} books, {len(stats)} stat records, and {len(progresses)} reading progresses.")
 
         # Optional Extractions
         if extract_epubs:
@@ -62,16 +53,12 @@ def run_migration(
             update_status("Parsing text replacement rules...")
             from src.replacements_exporter import ReplacementsExporter
 
-            global_count = ReplacementsExporter.export_global_rules(
-                extractor, output_dir
-            )
+            global_count = ReplacementsExporter.export_global_rules(extractor, output_dir)
             if global_count > 0:
                 update_status(f"Exported global replacements ({global_count} rules).")
 
             book_rules_map = ReplacementsExporter.extract_book_rules(extractor)
-            update_status(
-                f"Exported book-specific replacements for {len(book_rules_map)} books."
-            )
+            update_status(f"Exported book-specific replacements for {len(book_rules_map)} books.")
 
         # 3. Export to KOReader
         update_status("Generating KOReader statistics.sqlite and .sdr sidecars...")
@@ -80,12 +67,8 @@ def run_migration(
         exporter.export_sdr_folders(progresses, book_rules_map=book_rules_map)
 
     update_status("Migration complete!")
-    update_status(
-        "Copy the generated `statistics.sqlite3` to your KOReader settings folder."
-    )
-    update_status(
-        "Copy the generated `.sdr` folders next to your actual book files on your e-reader."
-    )
+    update_status("Copy the generated `statistics.sqlite3` to your KOReader settings folder.")
+    update_status("Copy the generated `.sdr` folders next to your actual book files on your e-reader.")
 
 
 def main():
@@ -114,13 +97,10 @@ def main():
     args = parser.parse_args()
 
     try:
-        run_migration(
-            args.input, args.output, args.extract_epubs, args.extract_replacements
-        )
+        run_migration(args.input, args.output, args.extract_epubs, args.extract_replacements)
     except Exception as e:
         print(f"Error during migration: {e}")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

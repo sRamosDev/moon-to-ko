@@ -1,7 +1,6 @@
 import pytest
 from src.main import run_migration
 
-
 def test_run_migration_file_not_found(tmp_path):
     input_file = tmp_path / "non_existent_file.mrpro"
     output_dir = tmp_path / "some_output_dir"
