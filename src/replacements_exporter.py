@@ -1,5 +1,6 @@
 # TEAM_001: Orchestrates extraction of Global and Book-specific text replacements from .mrpro into Lua formats.
 import os
+import zipfile
 
 from src.replacements_parser import ReplacementsParser
 
@@ -37,13 +38,14 @@ class ReplacementsExporter:
             if p.startswith("com.flyersoft.moonreaderp/shared_prefs/")
             and p.endswith(".r")
         ]
-        for rule_path in book_rules:
-            basename = os.path.basename(rule_path)
-            original_book = basename[:-2] if basename.endswith(".r") else basename
-            content = extractor.get_file_content(rule_path)
-            if content:
-                rules = ReplacementsParser.parse(content)
-                if rules:
-                    lua_str = ReplacementsParser.format_lua_table(rules)
-                    book_rules_map[original_book] = lua_str
+        with zipfile.ZipFile(extractor.mrpro_path, "r") as zf:
+            for rule_path in book_rules:
+                basename = os.path.basename(rule_path)
+                original_book = basename[:-2] if basename.endswith(".r") else basename
+                content = extractor.get_file_content(rule_path, zf=zf)
+                if content:
+                    rules = ReplacementsParser.parse(content)
+                    if rules:
+                        lua_str = ReplacementsParser.format_lua_table(rules)
+                        book_rules_map[original_book] = lua_str
         return book_rules_map
