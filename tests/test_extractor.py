@@ -42,3 +42,10 @@ def test_extract_db_to(dummy_mrpro, tmp_path):
     extractor.extract_db_to(str(dest))
     assert dest.exists()
     assert dest.read_bytes() == b"fake_db_content"
+
+def test_extract_file_to(dummy_mrpro, tmp_path):
+    extractor = MrproExtractor(str(dummy_mrpro))
+    dest = tmp_path / "mybook.epub.r"
+    extractor.extract_file_to("?/sdcard/Books/mybook.epub.r", str(dest))
+    assert dest.exists()
+    assert dest.read_bytes() == b"fake_progress_data"
