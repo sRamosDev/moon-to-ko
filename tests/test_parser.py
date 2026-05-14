@@ -33,5 +33,8 @@ def test_parse_rules_empty_pattern():
 
 def test_parse_rules_empty_line():
     content = b"\n\n  \n\t\n"
+    assert ReplacementsParser.format_lua_table([]) == ""
+def test_parse_empty_content():
+    content = b""
     rules = ReplacementsParser.parse(content)
     assert rules == []
