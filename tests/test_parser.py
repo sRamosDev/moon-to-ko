@@ -16,3 +16,6 @@ def test_format_lua_table():
     lua_str = ReplacementsParser.format_lua_table(rules)
     assert '["pattern"] = "\\\\+1"' in lua_str
     assert '["replace"] = "plus one"' in lua_str
+
+def test_format_lua_table_empty():
+    assert ReplacementsParser.format_lua_table([]) == ""
