@@ -10,13 +10,17 @@ class EpubExporter:
         ]
 
         from tqdm import tqdm
-        
+
         extracted_count = 0
         total_epubs = len(epub_paths)
-        
+
         # If GUI progress callback provided, skip tqdm to avoid terminal spam
-        iterator = epub_paths if progress_cb else tqdm(epub_paths, desc="Extracting EPUBs", unit="file")
-        
+        iterator = (
+            epub_paths
+            if progress_cb
+            else tqdm(epub_paths, desc="Extracting EPUBs", unit="file")
+        )
+
         for epub_path in iterator:
             basename = os.path.basename(epub_path)
             out_book = os.path.join(books_dir, basename)
