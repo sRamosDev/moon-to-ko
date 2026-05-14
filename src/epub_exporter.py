@@ -11,7 +11,6 @@ class EpubExporter:
             p for p in extractor.get_all_original_paths() if p.lower().endswith(".epub")
         ]
 
-        import zipfile
         from tqdm import tqdm
         
         extracted_count = 0
