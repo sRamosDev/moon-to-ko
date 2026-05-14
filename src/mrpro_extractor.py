@@ -54,7 +54,7 @@ class MrproExtractor:
 
         if zf is not None:
             return _read_from_zip(zf)
-            
+
         with zipfile.ZipFile(self.mrpro_path, "r") as mz:
             return _read_from_zip(mz)
 
