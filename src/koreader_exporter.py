@@ -77,9 +77,7 @@ class KOReaderExporter:
         book_rules_map = book_rules_map or {}
 
         # Collect all books that need an .sdr (either because of progress or rules)
-        all_basenames = set(
-            [os.path.basename(p.filename) for p in progresses if p.filename]
-        )
+        all_basenames = {os.path.basename(p.filename) for p in progresses if p.filename}
         all_basenames.update(book_rules_map.keys())
 
         prog_map = {os.path.basename(p.filename): p for p in progresses if p.filename}
