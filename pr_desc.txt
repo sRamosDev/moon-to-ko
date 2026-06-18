@@ -1,13 +1,7 @@
-💡 **What:** Modified `KOReaderExporter.export_statistics` in `src/koreader_exporter.py` to collect the records for insertion into a list, and then use `cursor.executemany` rather than making individual `cursor.execute` calls inside the loop.
-Also fixed format and lint issues inside the code base via `ruff format` and `ruff check --fix`.
+🧪 Add missing coverage for ReplacementsParser formatting
 
-🎯 **Why:** To improve database write performance by reducing the transaction overhead of running `INSERT` queries sequentially. Using `executemany` batches the insertion, which is natively supported and heavily optimized by SQLite.
+🎯 **What:** Fixed `test_parse_rules_empty_line` in `tests/test_parser.py` which was incorrectly asserting `ReplacementsParser.format_lua_table([])` instead of `ReplacementsParser.parse(content)`, leading to uncovered lines during empty rule parsing in `src/replacements_parser.py`. Also added `NoSeparatorLine\n` to properly cover condition where `#->#` separator is missing.
 
-📊 **Measured Improvement:**
-A benchmark involving inserting 1,000,000 book records and corresponding read statistics showed an overall performance improvement:
+📊 **Coverage:** Successfully covered line 21 in `replacements_parser.py`: `if not line or "#->#" not in line: continue`.
 
-* **Baseline (execute):** ~6.66 seconds
-* **Optimized (executemany):** ~5.19 seconds
-* **Improvement:** ~22% performance increase
-
-This demonstrates a measurable optimization without compromising functionality or correctness.
+✨ **Result:** Reached 100% test coverage for `src/replacements_parser.py`.
