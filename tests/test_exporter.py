@@ -9,15 +9,32 @@ def test_export_statistics(tmp_path):
     books = [
         BookRecord(
             id=1,
-            title="Test",
+            title="Test 1",
             filename="/a/b.epub",
-            author="Auth",
+            author="Auth 1",
             description="",
             category="",
-        )
+        ),
+        BookRecord(
+            id=2,
+            title="Test 2",
+            filename="/a/c.epub",
+            author="Auth 2",
+            description="",
+            category="",
+        ),
+        BookRecord(
+            id=3,
+            title="Test 3",
+            filename="/a/d.epub",
+            author="Auth 3",
+            description="",
+            category="",
+        ),
     ]
     stats = [
-        ReadStatistic(filename="/a/b.epub", usedTime=150000, readWords=100, dates="")
+        ReadStatistic(filename="/a/b.epub", usedTime=150000, readWords=100, dates=""),
+        ReadStatistic(filename="/a/c.epub", usedTime=5000, readWords=50, dates=""),
     ]
 
     exporter.export_statistics(books, stats)
@@ -27,12 +44,25 @@ def test_export_statistics(tmp_path):
 
     with sqlite3.connect(db_file) as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT title, authors, total_read_time FROM book")
+        cursor.execute("SELECT title, authors, total_read_time FROM book ORDER BY id")
         rows = cursor.fetchall()
-        assert len(rows) == 1
-        assert rows[0][0] == "Test"
-        assert rows[0][1] == "Auth"
+        assert len(rows) == 3
+
+        # Book 1: usedTime > 10000
+        assert rows[0][0] == "Test 1"
+        assert rows[0][1] == "Auth 1"
         assert rows[0][2] == 150  # 150000 // 1000
+
+        # Book 2: usedTime <= 10000
+        assert rows[1][0] == "Test 2"
+        assert rows[1][1] == "Auth 2"
+        assert rows[1][2] == 5000
+
+        # Book 3: No ReadStatistic
+        assert rows[2][0] == "Test 3"
+        assert rows[2][1] == "Auth 3"
+        assert rows[2][2] == 0
+
 
 def test_export_sdr_folders(tmp_path):
     exporter = KOReaderExporter(str(tmp_path))
