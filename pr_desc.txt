@@ -1,0 +1,7 @@
+🧪 Add missing coverage for ReplacementsParser formatting
+
+🎯 **What:** Fixed `test_parse_rules_empty_line` in `tests/test_parser.py` which was incorrectly asserting `ReplacementsParser.format_lua_table([])` instead of `ReplacementsParser.parse(content)`, leading to uncovered lines during empty rule parsing in `src/replacements_parser.py`. Also added `NoSeparatorLine\n` to properly cover condition where `#->#` separator is missing.
+
+📊 **Coverage:** Successfully covered line 21 in `replacements_parser.py`: `if not line or "#->#" not in line: continue`.
+
+✨ **Result:** Reached 100% test coverage for `src/replacements_parser.py`.

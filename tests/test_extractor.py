@@ -42,3 +42,25 @@ def test_extract_db_to(dummy_mrpro, tmp_path):
     extractor.extract_db_to(str(dest))
     assert dest.exists()
     assert dest.read_bytes() == b"fake_db_content"
+
+
+def test_extract_file_to(dummy_mrpro, tmp_path):
+    extractor = MrproExtractor(str(dummy_mrpro))
+    dest = tmp_path / "mybook.epub.r"
+    extractor.extract_file_to("?/sdcard/Books/mybook.epub.r", str(dest))
+    assert dest.exists()
+    assert dest.read_bytes() == b"fake_progress_data"
+
+
+def test_extractor_missing_names_list(tmp_path):
+    empty_zip_path = tmp_path / "empty.mrpro"
+    with zipfile.ZipFile(empty_zip_path, "w"):
+        pass
+
+    extractor = MrproExtractor(str(empty_zip_path))
+
+    with pytest.raises(
+        FileNotFoundError,
+        match="com.flyersoft.moonreaderp/_names.list not found in the backup archive.",
+    ):
+        extractor.get_all_original_paths()

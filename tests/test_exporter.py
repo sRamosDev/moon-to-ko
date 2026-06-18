@@ -64,7 +64,6 @@ def test_export_statistics(tmp_path):
         assert rows[2][2] == 0
 
 
-
 def test_export_sdr_folders(tmp_path):
     exporter = KOReaderExporter(str(tmp_path))
     progs = [
@@ -73,10 +72,20 @@ def test_export_sdr_folders(tmp_path):
             percentage=62.8,
             last_chapter=1,
             bookmark_text="",
+        ),
+        ReadProgress(
+            filename="/sdcard/Books/mybook_no_replacer.epub",
+            percentage=100.0,
+            last_chapter=1,
+            bookmark_text="",
         )
     ]
 
-    exporter.export_sdr_folders(progs)
+    book_rules_map = {
+        "mybook.epub": '{\n        ["replacements"] = {\n            ["foo"] = "bar"\n        }\n    }'
+    }
+
+    exporter.export_sdr_folders(progs, book_rules_map=book_rules_map)
 
     sdr_dir = tmp_path / "mybook.sdr"
     assert sdr_dir.is_dir()
@@ -87,3 +96,14 @@ def test_export_sdr_folders(tmp_path):
     content = lua_file.read_text()
     assert '["percent_finished"] = 0.628' in content
     assert '["status"] = "reading"' in content
+    assert '["htmlreplacer"] =' in content
+    assert '["foo"] = "bar"' in content
+
+    sdr_dir_no_replacer = tmp_path / "mybook_no_replacer.sdr"
+    assert sdr_dir_no_replacer.is_dir()
+
+    lua_file_no_replacer = sdr_dir_no_replacer / "metadata.epub.lua"
+    assert lua_file_no_replacer.exists()
+
+    content_no_replacer = lua_file_no_replacer.read_text()
+    assert '["htmlreplacer"] =' not in content_no_replacer
