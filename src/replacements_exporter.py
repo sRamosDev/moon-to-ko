@@ -1,5 +1,6 @@
 # TEAM_001: Orchestrates extraction of Global and Book-specific text replacements from .mrpro into Lua formats.
 import os
+import posixpath
 import zipfile
 
 from src.replacements_parser import ReplacementsParser
@@ -8,9 +9,13 @@ from src.replacements_parser import ReplacementsParser
 class ReplacementsExporter:
     @staticmethod
     def export_global_rules(extractor, output_dir: str) -> int:
-        global_content = extractor.get_file_content(
-            "com.flyersoft.moonreaderp/shared_prefs/names_replacement"
-        )
+        try:
+            global_content = extractor.get_file_content(
+                "com.flyersoft.moonreaderp/shared_prefs/names_replacement"
+            )
+        except FileNotFoundError:
+            return 0
+
         if not global_content:
             return 0
 
@@ -40,12 +45,15 @@ class ReplacementsExporter:
         ]
         with zipfile.ZipFile(extractor.mrpro_path, "r") as zf:
             for rule_path in book_rules:
-                basename = os.path.basename(rule_path)
+                basename = posixpath.basename(rule_path)
                 original_book = basename[:-2] if basename.endswith(".r") else basename
-                content = extractor.get_file_content(rule_path, zf=zf)
-                if content:
-                    rules = ReplacementsParser.parse(content)
-                    if rules:
-                        lua_str = ReplacementsParser.format_lua_table(rules)
-                        book_rules_map[original_book] = lua_str
+                try:
+                    content = extractor.get_file_content(rule_path, zf=zf)
+                    if content:
+                        rules = ReplacementsParser.parse(content)
+                        if rules:
+                            lua_str = ReplacementsParser.format_lua_table(rules)
+                            book_rules_map[original_book] = lua_str
+                except FileNotFoundError:
+                    pass
         return book_rules_map

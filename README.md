@@ -53,7 +53,7 @@ uv run python -m src.gui
 ### Building the standalone executable
 
 ```bash
-uv run pyinstaller --onefile --windowed --name MoonToKo --add-data "src;src" src/gui.py
+uv run pyinstaller --noconfirm --onedir --windowed --name MoonToKo --collect-all customtkinter --add-data "src;src" src/gui.py
 ```
 
 The executable will be generated in the `dist/` directory.
