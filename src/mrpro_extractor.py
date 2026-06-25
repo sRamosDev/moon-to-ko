@@ -46,13 +46,12 @@ class MrproExtractor:
 
         def _read_from_zip(z: zipfile.ZipFile):
             try:
-                z.getinfo(tag_filename)
+                with z.open(tag_filename) as f:
+                    return f.read()
             except KeyError:
                 raise FileNotFoundError(
                     f"Mapped tag file '{tag_filename}' not found in the backup archive."
                 )
-            with z.open(tag_filename) as f:
-                return f.read()
 
         if zf is not None:
             return _read_from_zip(zf)
@@ -73,13 +72,12 @@ class MrproExtractor:
 
         def _extract_from_zip(z: zipfile.ZipFile):
             try:
-                z.getinfo(tag_filename)
+                with z.open(tag_filename) as src, open(destination_path, "wb") as dst:
+                    shutil.copyfileobj(src, dst)
             except KeyError:
                 raise FileNotFoundError(
                     f"Mapped tag file '{tag_filename}' not found in the backup archive."
                 )
-            with z.open(tag_filename) as src, open(destination_path, "wb") as dst:
-                shutil.copyfileobj(src, dst)
 
         if zf is not None:
             _extract_from_zip(zf)
