@@ -78,7 +78,7 @@ def test_export_sdr_folders(tmp_path):
             percentage=100.0,
             last_chapter=1,
             bookmark_text="",
-        )
+        ),
     ]
 
     book_rules_map = {
