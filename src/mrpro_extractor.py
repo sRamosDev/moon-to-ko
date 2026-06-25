@@ -2,6 +2,7 @@ import zipfile
 import typing
 import shutil
 
+
 class MrproExtractor:
     def __init__(self, mrpro_path: str):
         self.mrpro_path = mrpro_path
@@ -15,12 +16,14 @@ class MrproExtractor:
         with zipfile.ZipFile(self.mrpro_path, "r") as zf:
             names_list_path = "com.flyersoft.moonreaderp/_names.list"
             try:
-                with zf.open(names_list_path) as f:
-                    content = f.read().decode("utf-8")
+                zf.getinfo(names_list_path)
             except KeyError:
                 raise FileNotFoundError(
                     f"{names_list_path} not found in the backup archive."
                 )
+
+            with zf.open(names_list_path) as f:
+                content = f.read().decode("utf-8")
 
             for idx, line in enumerate(content.splitlines()):
                 cleaned_line = line.strip()
@@ -43,12 +46,13 @@ class MrproExtractor:
 
         def _read_from_zip(z: zipfile.ZipFile):
             try:
-                with z.open(tag_filename) as f:
-                    return f.read()
+                z.getinfo(tag_filename)
             except KeyError:
                 raise FileNotFoundError(
                     f"Mapped tag file '{tag_filename}' not found in the backup archive."
                 )
+            with z.open(tag_filename) as f:
+                return f.read()
 
         if zf is not None:
             return _read_from_zip(zf)
@@ -66,14 +70,22 @@ class MrproExtractor:
     ):
         """Extract a Specific file to a destination path."""
         tag_filename = self._get_tag_filename(original_path)
-        with zipfile.ZipFile(self.mrpro_path, "r") as mz:
+
+        def _extract_from_zip(z: zipfile.ZipFile):
             try:
-                with mz.open(tag_filename) as src, open(destination_path, "wb") as dst:
-                    shutil.copyfileobj(src, dst)
+                z.getinfo(tag_filename)
             except KeyError:
                 raise FileNotFoundError(
                     f"Mapped tag file '{tag_filename}' not found in the backup archive."
                 )
+            with z.open(tag_filename) as src, open(destination_path, "wb") as dst:
+                shutil.copyfileobj(src, dst)
+
+        if zf is not None:
+            _extract_from_zip(zf)
+        else:
+            with zipfile.ZipFile(self.mrpro_path, "r") as mz:
+                _extract_from_zip(mz)
 
     def extract_db_to(self, destination_path: str):
         """Helper to specifically extract the mrbooks.db sqlite file."""

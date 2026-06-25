@@ -1,6 +1,7 @@
 # TEAM_001: Exports parsed records to KOReader statistics.sqlite and .sdr Lua sidecars
 import sqlite3
 import os
+import posixpath
 from typing import List
 from src.db_mapper import BookRecord, ReadStatistic, ReadProgress
 
@@ -77,10 +78,12 @@ class KOReaderExporter:
         book_rules_map = book_rules_map or {}
 
         # Collect all books that need an .sdr (either because of progress or rules)
-        all_basenames = {os.path.basename(p.filename) for p in progresses if p.filename}
+        all_basenames = {
+            posixpath.basename(p.filename) for p in progresses if p.filename
+        }
         all_basenames.update(book_rules_map.keys())
 
-        prog_map = {os.path.basename(p.filename): p for p in progresses if p.filename}
+        prog_map = {posixpath.basename(p.filename): p for p in progresses if p.filename}
 
         for basename in all_basenames:
             name_ext = os.path.splitext(basename)

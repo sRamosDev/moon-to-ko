@@ -1,4 +1,7 @@
 import os
+import posixpath
+import zipfile
+
 
 class EpubExporter:
     @staticmethod
@@ -21,17 +24,18 @@ class EpubExporter:
             else tqdm(epub_paths, desc="Extracting EPUBs", unit="file")
         )
 
-        for epub_path in iterator:
-            basename = os.path.basename(epub_path)
-            out_book = os.path.join(books_dir, basename)
+        with zipfile.ZipFile(extractor.mrpro_path, "r") as zf:
+            for epub_path in iterator:
+                basename = posixpath.basename(epub_path)
+                out_book = os.path.join(books_dir, basename)
 
-            try:
-                extractor.extract_file_to(epub_path, out_book)
-                extracted_count += 1
-                if progress_cb:
-                    progress_cb(extracted_count, total_epubs)
-            except Exception:
-                # Handle case where file might not exist or other issues
-                pass
-                
+                try:
+                    extractor.extract_file_to(epub_path, out_book, zf=zf)
+                    extracted_count += 1
+                    if progress_cb:
+                        progress_cb(extracted_count, total_epubs)
+                except Exception:
+                    # Handle case where file might not exist or other issues
+                    pass
+
         return extracted_count
